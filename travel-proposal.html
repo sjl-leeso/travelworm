@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🇰🇿🇰🇬 카자흐스탄 + 키르기스스탄</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+    }
+
+    section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: #6366f1;
+    }
+
+    .section-title {
+      font-size: 34px;
+      font-weight: 900;
+      margin-bottom: 40px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* ── Nav Dots ── */
+    #navDots {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 999;
+      background: rgba(0,0,0,0.15);
+      border-radius: 20px;
+      padding: 10px 6px;
+    }
+
+    .nav-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .nav-dot.active {
+      background: white;
+      transform: scale(1.5);
+    }
+
+    /* ════════════════════════════
+       S0 · CITY ROLLING TITLE
+    ════════════════════════════ */
+    #s0 {
+      background: radial-gradient(ellipse at 50% 40%, #0d1b3e 0%, #030712 70%);
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* 별 */
+    .stars {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    }
+
+    .s0-content { position: relative; z-index: 1; }
+
+    .s0-eyebrow {
+      font-size: 11px; letter-spacing: 6px; color: #94a3b8;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+
+    .city-roll-wrap {
+      height: 80px; overflow: hidden; position: relative;
+      margin-bottom: 16px;
+    }
+
+    .city-roll-text {
+      font-size: 72px; font-weight: 900; line-height: 80px;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .s0-suffix {
+      font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.55);
+      letter-spacing: 2px;
+    }
+
+    .s0-scroll-hint {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      font-size: 12px; color: rgba(255,255,255,0.25);
+      animation: fadeUpDown 2s infinite;
+    }
+
+    /* ════════════════════════════
+       SA · PRESENTER INTRO
+    ════════════════════════════ */
+    #sa {
+      background: linear-gradient(145deg, #0a0a0f 0%, #1a1030 60%, #0f1729 100%);
+      color: white;
+    }
+
+    .sa-layout {
+      display: flex; gap: 52px; align-items: center;
+      width: 100%; max-width: 900px;
+    }
+
+    .sa-photo {
+      flex-shrink: 0; width: 260px;
+    }
+    .sa-photo img {
+      width: 100%; border-radius: 24px;
+      box-shadow: 0 0 60px rgba(99,102,241,0.3);
+      display: block;
+    }
+    .sa-photo-fallback {
+      width: 260px; height: 320px; border-radius: 24px;
+      background: linear-gradient(135deg, #6366f130, #a855f730);
+      border: 2px solid rgba(99,102,241,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px;
+    }
+
+    .sa-right { flex: 1; }
+
+    .presenter-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 20px;
+      border: 1px solid rgba(165,180,252,0.3);
+      font-size: 11px; letter-spacing: 4px;
+      color: #a5b4fc; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .presenter-name {
+      font-size: 38px; font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .presenter-intro {
+      font-size: 14px; line-height: 1.85;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid #6366f1;
+      border-radius: 0 12px 12px 0;
+    }
+    .presenter-intro strong { color: #a5b4fc; }
+
+    .track-list {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .track-item {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 12px 16px; text-align: left;
+    }
+
+    .track-icon { font-size: 20px; flex-shrink: 0; }
+    .track-text { flex: 1; }
+    .track-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 2px; }
+    .track-desc  { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+    .track-badge {
+      padding: 3px 10px; border-radius: 10px;
+      background: rgba(99,102,241,0.2);
+      border: 1px solid rgba(99,102,241,0.35);
+      font-size: 11px; color: #a5b4fc; font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ════════════════════════════
+       SB · EXPERTISE + IMAGE STRIP
+    ════════════════════════════ */
+    #sb {
+      background: #0f0f17;
+      color: white;
+      padding: 72px 48px 0;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .exp-layout {
+      display: flex; gap: 52px; align-items: center;
+      width: 100%; max-width: 860px;
+      margin-bottom: 40px;
+    }
+
+    .exp-left { flex: 1; }
+    .exp-right { width: 320px; flex-shrink: 0; }
+
+    .exp-eyebrow {
+      font-size: 11px; letter-spacing: 5px; color: #6366f1;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    .exp-title {
+      font-size: 34px; font-weight: 900; line-height: 1.15;
+      margin-bottom: 18px; color: white;
+    }
+    .exp-title em { color: #a5b4fc; font-style: normal; }
+
+    .exp-body {
+      font-size: 14px; color: rgba(255,255,255,0.45);
+      line-height: 1.9; margin-bottom: 28px;
+    }
+
+    .exp-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .exp-stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 18px 16px;
+    }
+    .exp-stat-num {
+      font-size: 34px; font-weight: 900;
+      background: linear-gradient(135deg, #a5b4fc, #818cf8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .exp-stat-label { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 6px; }
+
+    /* 오른쪽 이미지 그리드 */
+    .img-grid-2x2 {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; border-radius: 20px; overflow: hidden;
+    }
+    .img-cell {
+      aspect-ratio: 4/3; background: #1e293b;
+      overflow: hidden; position: relative;
+    }
+    .img-cell img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .img-cell:hover img { transform: scale(1.05); }
+    .img-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 6px 10px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.65));
+      font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600;
+    }
+
+    /* 이미지 스트립 */
+    .strip-outer {
+      width: 100vw; overflow: hidden;
+      position: relative; margin-top: 32px;
+      padding-bottom: 32px;
+    }
+
+    .strip-track {
+      display: flex; gap: 10px;
+      animation: stripScroll 40s linear infinite;
+      width: max-content;
+    }
+    .strip-outer:hover .strip-track { animation-play-state: paused; }
+
+    @keyframes stripScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .strip-item {
+      flex-shrink: 0; width: 200px; height: 130px;
+      border-radius: 12px; overflow: hidden; position: relative;
+      cursor: pointer;
+    }
+    .strip-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+    .strip-item:hover img { transform: scale(1.08); }
+    .strip-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 5px 10px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600;
+    }
+    .strip-fallback {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+
+    /* ════════════════════════════
+       SC · DISCOVERY + HERO (MERGED)
+    ════════════════════════════ */
+    #sc {
+      background: linear-gradient(145deg, #060c18 0%, #0d1f3a 100%);
+      color: white;
+      padding: 60px 48px;
+    }
+
+    .disc-header {
+      text-align: center; margin-bottom: 28px; width: 100%; max-width: 720px;
+    }
+
+    .disc-eyebrow {
+      font-size: 11px; letter-spacing: 5px; color: #94a3b8;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    .disc-title {
+      font-size: 32px; font-weight: 900; line-height: 1.2; margin-bottom: 6px;
+    }
+    .disc-title strong { color: #a5b4fc; }
+
+    /* 갤러리 */
+    .disc-gallery {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      width: 100%; max-width: 860px;
+      height: 280px;
+      margin-bottom: 28px;
+    }
+
+    .disc-img {
+      background: #1e2d3a; border-radius: 12px; overflow: hidden;
+      position: relative;
+    }
+    .disc-img.large { grid-row: span 2; }
+    .disc-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .disc-img:hover img { transform: scale(1.06); }
+    .disc-img-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 8px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600;
+    }
+
+    /* Hero title (merged) */
+    .hero-merged {
+      text-align: center; margin-bottom: 24px;
+    }
+    .hero-flags { font-size: 48px; margin-bottom: 10px; line-height: 1; }
+    .hero-sub-text {
+      font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.55);
+      letter-spacing: 1px; line-height: 1.4;
+    }
+    .hero-title {
+      font-size: 62px; font-weight: 900; line-height: 1.05;
+      margin: 6px 0;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* 4 image cards */
+    .hero-cards {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; width: 100%; max-width: 860px;
+    }
+
+    .hero-card {
+      border-radius: 16px; overflow: hidden;
+      position: relative; height: 160px;
+      background: #1e293b;
+      cursor: pointer;
+    }
+    .hero-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .hero-card:hover img { transform: scale(1.07); }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none;
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.92);
+      flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+
+    .lb-img-wrap {
+      position: relative;
+      max-width: 90vw; max-height: 78vh;
+      border-radius: 16px; overflow: hidden;
+    }
+    .lb-img-wrap img {
+      display: block;
+      max-width: 90vw; max-height: 78vh;
+      object-fit: contain;
+      border-radius: 16px;
+      transition: opacity 0.25s ease;
+    }
+
+    .lb-label {
+      margin-top: 18px;
+      font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85);
+      letter-spacing: 0.5px;
+    }
+
+    .lb-counter {
+      margin-top: 8px;
+      font-size: 12px; color: rgba(255,255,255,0.35);
+      letter-spacing: 2px;
+    }
+
+    .lb-btn {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white; font-size: 20px;
+      cursor: pointer; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lb-btn:hover { background: rgba(255,255,255,0.25); }
+    .lb-prev { left: 24px; }
+    .lb-next { right: 24px; }
+
+    .lb-close {
+      position: fixed; top: 20px; right: 24px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white; font-size: 18px;
+      cursor: pointer; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lb-close:hover { background: rgba(255,255,255,0.25); }
+
+    .lb-dots {
+      display: flex; gap: 8px; margin-top: 14px;
+    }
+    .lb-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      cursor: pointer; border: none; padding: 0;
+      transition: all 0.2s;
+    }
+    .lb-dot.active { background: white; transform: scale(1.3); }
+    .hero-card-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 8px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.75));
+      font-size: 11px; color: rgba(255,255,255,0.9); font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* ════════════════════════════
+       S3 · CAROUSEL COMPARISON
+    ════════════════════════════ */
+    #s3 { background: #f8fafc; color: #1e293b; padding: 60px 48px; }
+    #s3 .section-label { color: #6366f1; }
+    #s3 .section-title { color: #1e293b; margin-bottom: 28px; }
+
+    .carousel-wrapper {
+      width: 100%; max-width: 780px;
+      position: relative;
+    }
+
+    .cmp-viewport {
+      overflow: hidden; border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    }
+
+    .cmp-slides {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .cmp-slide {
+      flex: 0 0 100%;
+      display: grid; grid-template-columns: 1fr 48px 1fr;
+      align-items: stretch;
+      min-height: 200px;
+    }
+
+    .cmp-side {
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .cmp-side-left  { background: #f1f5f9; }
+    .cmp-side-right { background: linear-gradient(135deg, #ede9fe, #dbeafe); }
+
+    .cmp-side-img {
+      flex: 1; overflow: hidden; position: relative;
+      min-height: 120px;
+      max-height: 340px;
+    }
+    .cmp-side-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+
+    .cmp-side-info {
+      padding: 14px 16px; text-align: center;
+      flex-shrink: 0;
+    }
+    .cmp-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 700; margin-bottom: 6px;
+    }
+    .cmp-badge-world { background: #e0e7ff; color: #4338ca; }
+    .cmp-badge-kz    { background: #ddd6fe; color: #7c3aed; }
+    .cmp-place-name  { font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+    .cmp-place-sub   { font-size: 11px; color: #64748b; }
+
+    .cmp-vs-col {
+      display: flex; align-items: center; justify-content: center;
+      background: white;
+      font-size: 12px; font-weight: 800; color: #94a3b8;
+      letter-spacing: 1px;
+    }
+
+    /* prev / next buttons */
+    .carousel-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: white; border: 1.5px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10; transition: all 0.2s;
+    }
+    .carousel-btn:hover { background: #6366f1; color: white; border-color: #6366f1; }
+    .carousel-btn.prev { left: -20px; }
+    .carousel-btn.next { right: -20px; }
+
+    /* dot nav */
+    .carousel-dots {
+      display: flex; justify-content: center; gap: 8px;
+      margin-top: 18px;
+    }
+    .cdot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #cbd5e1; cursor: pointer;
+      transition: all 0.2s; border: none; padding: 0;
+    }
+    .cdot.active { background: #6366f1; transform: scale(1.3); }
+
+    /* ════════════════════════════
+       S4 · CULTURE
+    ════════════════════════════ */
+    #s4 {
+      background: linear-gradient(145deg, #1e1b4b 0%, #2d1f6e 100%);
+      color: white;
+    }
+    #s4 .section-title { color: white; }
+
+    .culture-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 18px; width: 100%; max-width: 860px;
+    }
+
+    .culture-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 30px 22px; text-align: center;
+    }
+    .culture-icon  { font-size: 40px; margin-bottom: 14px; }
+    .culture-title { font-size: 17px; font-weight: 800; margin-bottom: 10px; }
+    .culture-desc  { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.75; }
+
+    /* ════════════════════════════
+       S5 · INTERACTIVE MEMBER PROFILES
+    ════════════════════════════ */
+    #s5 { background: #f8fafc; color: #1e293b; }
+    #s5 .section-label { color: #6366f1; }
+    #s5 .section-title { color: #1e293b; margin-bottom: 20px; }
+
+    .member-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 24px;
+    }
+
+    .mtab {
+      padding: 8px 16px; border-radius: 20px;
+      border: 1.5px solid #e2e8f0; background: white;
+      color: #64748b; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .mtab.active {
+      border-color: transparent; color: white; font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .member-detail {
+      display: flex; gap: 40px; align-items: flex-start;
+      background: white; border-radius: 24px;
+      padding: 32px; max-width: 780px; width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    .member-chart-wrap {
+      width: 280px; height: 240px; flex-shrink: 0;
+    }
+
+    .member-info { flex: 1; }
+
+    .member-info-top {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 16px;
+    }
+    .member-emoji-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .member-detail-name { font-size: 22px; font-weight: 900; color: #1e293b; }
+    .member-detail-type { font-size: 12px; margin-top: 3px; }
+
+    .member-reason-label {
+      font-size: 10px; letter-spacing: 3px; color: #94a3b8;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .member-reason-text {
+      font-size: 15px; color: #334155; line-height: 1.75;
+      padding: 14px 18px;
+      background: #f8fafc; border-radius: 12px;
+      border-left: 3px solid currentColor;
+    }
+
+    .member-sig-stat {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; padding: 5px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 700;
+    }
+
+    /* ════════════════════════════
+       S6 · WHY NOW
+    ════════════════════════════ */
+    #s6 {
+      background: #0f172a; color: white;
+      padding: 36px 48px;
+      justify-content: center;
+    }
+    #s6 .section-label { margin-bottom: 6px; }
+    #s6 .section-title { color: white; font-size: 28px; margin-bottom: 16px; }
+
+    .reason-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; width: 100%; max-width: 860px;
+    }
+
+    .reason-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+
+    .reason-num {
+      font-size: 9px; letter-spacing: 3px; color: #6366f1;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .reason-icon-title {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .reason-icon  { font-size: 26px; flex-shrink: 0; }
+    .reason-title { font-size: 16px; font-weight: 800; line-height: 1.3; }
+    .reason-body  { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.7; margin-bottom: 8px; }
+
+    .reason-hl {
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 8px; padding: 8px 12px;
+      font-size: 11px; color: #a5b4fc; line-height: 1.55;
+    }
+
+    /* S6 팀 스탯 */
+    .team-stat-wrap {
+      display: flex; gap: 28px; align-items: center;
+      width: 100%; max-width: 860px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .team-chart-box {
+      width: 220px; height: 190px; flex-shrink: 0;
+    }
+
+    .team-bars { flex: 1; display: flex; flex-direction: column; gap: 9px; }
+
+    .tbar-row { display: flex; align-items: center; gap: 8px; }
+    .tbar-name { width: 46px; font-size: 12px; color: #94a3b8; flex-shrink: 0; }
+
+    .tbar-wrap {
+      flex: 1; height: 8px; background: rgba(255,255,255,0.08);
+      border-radius: 4px; position: relative;
+    }
+    .tbar-req {
+      position: absolute; top: 0; height: 100%;
+      border-radius: 4px; background: rgba(255,255,255,0.15);
+    }
+    .tbar-team {
+      position: absolute; top: -2px; height: 12px; border-radius: 6px;
+    }
+
+    .tbar-icon { font-size: 13px; width: 18px; text-align: center; }
+    .tbar-note { font-size: 10px; color: #475569; white-space: nowrap; }
+
+    .team-stat-summary {
+      margin-top: 10px; padding: 9px 14px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 10px; font-size: 12px;
+      color: #a5b4fc; line-height: 1.6;
+    }
+    .team-stat-summary strong { color: white; }
+
+    /* ════════════════════════════
+       S7 · COMMENT FORM
+    ════════════════════════════ */
+    #s7 {
+      background: linear-gradient(145deg, #0d1b2a 0%, #1a2d4a 40%, #2e1b6e 100%);
+      color: white;
+    }
+
+    .s7-layout {
+      display: flex; flex-direction: column; gap: 36px; align-items: center;
+      width: 100%; max-width: 560px;
+      text-align: center;
+    }
+
+    .s7-left { width: 100%; }
+    .s7-right { width: 100%; }
+
+    .s7-title {
+      font-size: 38px; font-weight: 900; margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+    .s7-sub {
+      font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 28px;
+    }
+
+    /* comment form */
+    .comment-form {
+      display: flex; flex-direction: column; gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .cf-label {
+      font-size: 11px; letter-spacing: 2px; color: #a5b4fc;
+      text-transform: uppercase; margin-bottom: 4px; display: block;
+    }
+
+    .cf-input, .cf-textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px; padding: 12px 16px;
+      color: white; font-size: 14px;
+      font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .cf-input:focus, .cf-textarea:focus {
+      border-color: rgba(165,180,252,0.6);
+    }
+    .cf-input::placeholder, .cf-textarea::placeholder {
+      color: rgba(255,255,255,0.25);
+    }
+    .cf-textarea { resize: none; height: 80px; }
+
+    .cf-submit {
+      padding: 13px 28px; border-radius: 14px;
+      background: #6366f1; color: white;
+      font-size: 14px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: all 0.2s; align-self: flex-start;
+    }
+    .cf-submit:hover { background: #4f46e5; transform: translateY(-2px); }
+
+    /* comment list */
+    .comment-list {
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: 300px; overflow-y: auto;
+    }
+    .comment-list::-webkit-scrollbar { width: 4px; }
+    .comment-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    .comment-item {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; padding: 14px 16px;
+    }
+    .ci-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+    }
+    .ci-name { font-size: 13px; font-weight: 700; color: white; }
+    .ci-dest {
+      padding: 2px 10px; border-radius: 10px;
+      background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.3);
+      font-size: 11px; color: #a5b4fc; font-weight: 600;
+    }
+    .ci-reason { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+    .comment-empty {
+      font-size: 13px; color: rgba(255,255,255,0.25); text-align: center;
+      padding: 20px;
+    }
+
+    /* vote section */
+    .vote-section { text-align: center; margin-top: 24px; }
+    .vote-wrap { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      padding: 13px 26px; border-radius: 14px;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-yes { background: #6366f1; color: white; }
+    .btn-yes:hover { background: #4f46e5; transform: translateY(-2px); }
+    .btn-no {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .btn-no:hover { background: rgba(255,255,255,0.12); }
+
+    #voteResult {
+      margin-top: 16px; font-size: 14px;
+      color: rgba(255,255,255,0.45); min-height: 22px;
+    }
+
+    /* ── Shared animations ── */
+    @keyframes fadeUpDown {
+      0%,100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+      50%      { opacity: 1;   transform: translateX(-50%) translateY(-4px); }
+    }
+    @keyframes fadeUpDownNoTranslate {
+      0%,100% { opacity: 0.4; transform: translateY(0); }
+      50%      { opacity: 1;   transform: translateY(-4px); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation dots -->
+<div id="navDots"></div>
+
+<!-- ══════════════════════════════
+     S0 · 롤링 타이틀
+══════════════════════════════ -->
+<section id="s0">
+  <canvas class="stars" id="starsCanvas"></canvas>
+  <div class="s0-content">
+    <div class="s0-eyebrow">✈️ The Next Adventure</div>
+    <div class="city-roll-wrap">
+      <div class="city-roll-text" id="cityRoll">하얼빈</div>
+    </div>
+    <div class="s0-suffix">대소동은 계속된다!</div>
+  </div>
+  <div class="s0-scroll-hint">↓ 스크롤 또는 키보드 방향키</div>
+</section>
+
+<!-- ══════════════════════════════
+     SA · 발표자 소개
+══════════════════════════════ -->
+<section id="sa">
+  <div class="sa-layout">
+    <!-- 사진 -->
+    <div class="sa-photo">
+      <img src="img-presenter-sojung.png" alt="이소정"
+           onerror="this.parentElement.innerHTML='<div class=sa-photo-fallback>🎭</div>'">
+    </div>
+
+    <!-- 텍스트 -->
+    <div class="sa-right">
+      <div class="presenter-badge">🎤 오늘의 발표자</div>
+      <div class="presenter-name">이소정</div>
+
+      <p class="presenter-intro">
+        <strong>세치 혀</strong>로 회사 사람 6명이 인당 <strong>1,600만 원</strong>씩 돈내고
+        12일 휴가 쓰게 만든 사람.<br>
+        <strong>영하 20도</strong> 하얼빈으로 동기 남편을 데려간 사람.<br>
+        이제 5월에 <strong>이시가키</strong>라고 태어나서 처음 듣는 곳으로
+        여러분 5명을 인도할 사람.<br><br>
+        여행의 악마, 여행의 수도자,<br>
+        여행의 알파이자 오메가, 항공권의 기획자<br>
+        <strong>이소정</strong>
+      </p>
+
+      <div class="track-list">
+        <div class="track-item">
+          <div class="track-icon">🧊</div>
+          <div class="track-text">
+            <div class="track-title">하얼빈 (2026년 1월 완료)</div>
+            <div class="track-desc">눈치가 있으면 껴주세요</div>
+          </div>
+          <div class="track-badge">성공</div>
+        </div>
+        <div class="track-item">
+          <div class="track-icon">🏝️</div>
+          <div class="track-text">
+            <div class="track-title">이시가키 (2026년 5월 예정)</div>
+            <div class="track-desc">이미 항공권 구매 완료</div>
+          </div>
+          <div class="track-badge">성공</div>
+        </div>
+        <div class="track-item">
+          <div class="track-icon">🇰🇿</div>
+          <div class="track-text">
+            <div class="track-title">카자흐스탄 + 키르기스스탄 (제안)</div>
+            <div class="track-desc">오늘 이 자리에서 결판 냅니다.</div>
+          </div>
+          <div class="track-badge" style="background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.4);color:#fbbf24;">Today</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     SB · 전문성 배경 + 이미지 스트립
+══════════════════════════════ -->
+<section id="sb">
+  <div class="exp-layout">
+    <div class="exp-left">
+      <div class="exp-eyebrow">Why Trust Me</div>
+      <h2 class="exp-title">항공권 기획자가<br><em>직접 찾은</em> 여행지</h2>
+      <p class="exp-body">
+        네이버 항공 서비스 기획 3년 차.<br>
+        항공권 기획자는... 저작권 없는 이미지를 찾아 오늘도 헤맵니다.<br>
+        전 세계 도시 <strong style="color:white;">512개</strong> 이미지를 바꾸면서 깨달은 것...
+      </p>
+    </div>
+
+    <div class="exp-right">
+      <div class="exp-stats">
+        <div class="exp-stat-card">
+          <div class="exp-stat-num">3년</div>
+          <div class="exp-stat-label">항공권 서비스 기획 경력</div>
+        </div>
+        <div class="exp-stat-card">
+          <div class="exp-stat-num">512</div>
+          <div class="exp-stat-label">직접 큐레이션한 도시 이미지 수</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 이미지 스트립 -->
+  <div class="strip-outer">
+    <div class="strip-track" id="imgStrip"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     SC · 알마티 발견 스토리 + HERO (merged)
+══════════════════════════════ -->
+<section id="sc">
+  <div class="disc-header">
+    <div class="disc-eyebrow">The Discovery</div>
+    <div class="hero-flags">🇰🇿 🇰🇬</div>
+    <div class="hero-sub-text">나는</div>
+    <h1 class="hero-title">카자흐스탄 + 키르기스스탄</h1>
+    <div class="hero-sub-text">에 가고 싶다!</div>
+  </div>
+
+  <!-- 4 image cards -->
+  <div class="hero-cards">
+    <div class="hero-card" onclick="openLightbox(0)">
+      <img src="img-kyrg-bishkek.jpg" alt="비슈케크"
+           onerror="this.parentElement.style.background='linear-gradient(135deg,#1e3a5f,#2d4a7a)'">
+      <div class="hero-card-label">도시 뒤로 설산이 펼쳐진 비슈케크</div>
+    </div>
+    <div class="hero-card" onclick="openLightbox(1)">
+      <img src="img-kaza-summer.jpg" alt="여름 카자흐스탄"
+           onerror="this.parentElement.style.background='linear-gradient(135deg,#1a4d2e,#2d6b3e)'">
+      <div class="hero-card-label">푸릇함이 펼쳐진 여름 카자흐스탄</div>
+    </div>
+    <div class="hero-card" onclick="openLightbox(2)">
+      <img src="img-kaza-LakeKaindy.jpg" alt="카인디 호수"
+           onerror="this.parentElement.style.background='linear-gradient(135deg,#0f2a4a,#1e4060)'">
+      <div class="hero-card-label">물 위 자작나무 숲 카인디 호수</div>
+    </div>
+    <div class="hero-card" onclick="openLightbox(3)">
+      <img src="img-kyrg-Karakoł.jpg" alt="알틴 아라샨"
+           onerror="this.parentElement.style.background='linear-gradient(135deg,#2a1f4a,#3d2b6e)'">
+      <div class="hero-card-label">산과 하늘에 압도되는 알틴 아라샨</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     S3 · 세계 명소 비교 캐러셀
+══════════════════════════════ -->
+<section id="s3">
+  <div class="section-label">세계 명소 비교</div>
+  <h2 class="section-title">한 번에 세계를 경험한다</h2>
+
+  <div class="carousel-wrapper">
+    <div class="cmp-viewport">
+      <div class="cmp-slides" id="cmpSlides">
+
+        <!-- Slide 1: 오에시넨 호수 vs 빅알마티 호수 -->
+        <div class="cmp-slide">
+          <div class="cmp-side cmp-side-left">
+            <div class="cmp-side-img">
+              <img src="img-swiss-oeschinensee.jpg" alt="오에시넨 호수"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#bfdbfe,#93c5fd)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-world">🌍 세계 명소</span>
+              <div class="cmp-place-name">스위스 오에시넨 호수</div>
+              <div class="cmp-place-sub">스위스 알프스 에메랄드 호수</div>
+            </div>
+          </div>
+          <div class="cmp-vs-col">vs</div>
+          <div class="cmp-side cmp-side-right">
+            <div class="cmp-side-img">
+              <img src="img-kaza-almatylake.jpg" alt="빅알마티 호수"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#c4b5fd,#a5b4fc)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-kz">🇰🇿 카자흐스탄</span>
+              <div class="cmp-place-name">빅알마티 호수</div>
+              <div class="cmp-place-sub">만년설 + 에메랄드 호수</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: 그랜드캐니언 vs 차른 캐니언 -->
+        <div class="cmp-slide">
+          <div class="cmp-side cmp-side-left">
+            <div class="cmp-side-img">
+              <img src="img-grand-canyon.jpg" alt="그랜드캐니언"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#fed7aa,#fbbf24)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-world">🌍 세계 명소</span>
+              <div class="cmp-place-name">미국 그랜드캐니언</div>
+              <div class="cmp-place-sub">협곡의 상징</div>
+            </div>
+          </div>
+          <div class="cmp-vs-col">vs</div>
+          <div class="cmp-side cmp-side-right">
+            <div class="cmp-side-img">
+              <img src="img-kaza-charyn-canyon.jpg" alt="차른 캐니언"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#c4b5fd,#a5b4fc)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-kz">🇰🇿 카자흐스탄</span>
+              <div class="cmp-place-name">차른 캐니언</div>
+              <div class="cmp-place-sub">중앙아시아의 그랜드캐니언</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: 스위스 알프스 vs 키르기스 초원 -->
+        <div class="cmp-slide">
+          <div class="cmp-side cmp-side-left">
+            <div class="cmp-side-img">
+              <img src="img-swiss-Alps.jpg" alt="스위스 알프스"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#bfdbfe,#93c5fd)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-world">🌍 세계 명소</span>
+              <div class="cmp-place-name">스위스 알프스</div>
+              <div class="cmp-place-sub">만년설 · 유럽 최고 절경</div>
+            </div>
+          </div>
+          <div class="cmp-vs-col">vs</div>
+          <div class="cmp-side cmp-side-right">
+            <div class="cmp-side-img">
+              <img src="img-kygr-meadow.jpg" alt="키르기스 초원"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#c4b5fd,#a5b4fc)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-kz">🇰🇬 키르기스스탄</span>
+              <div class="cmp-place-name">키르기스 초원</div>
+              <div class="cmp-place-sub">유르트 + 말타기 + 알프스급 경치</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: 제네바 호수 vs 이식쿨 호수 -->
+        <div class="cmp-slide">
+          <div class="cmp-side cmp-side-left">
+            <div class="cmp-side-img">
+              <img src="img-swiss-geneva.jpg" alt="제네바 호수"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#bfdbfe,#93c5fd)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-world">🌍 세계 명소</span>
+              <div class="cmp-place-name">제네바 호수</div>
+              <div class="cmp-place-sub">유럽 대표 호수</div>
+            </div>
+          </div>
+          <div class="cmp-vs-col">vs</div>
+          <div class="cmp-side cmp-side-right">
+            <div class="cmp-side-img">
+              <img src="img-kyrg-Issyk-Kul.jpg" alt="이식쿨 호수"
+                   onerror="this.parentElement.style.background='linear-gradient(135deg,#c4b5fd,#a5b4fc)'">
+            </div>
+            <div class="cmp-side-info">
+              <span class="cmp-badge cmp-badge-kz">🇰🇬 키르기스스탄</span>
+              <div class="cmp-place-name">이식쿨 호수</div>
+              <div class="cmp-place-sub">중앙아시아 산속 바다</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /cmp-slides -->
+    </div><!-- /cmp-viewport -->
+
+    <button class="carousel-btn prev" onclick="moveCmp(-1)">←</button>
+    <button class="carousel-btn next" onclick="moveCmp(1)">→</button>
+  </div>
+
+  <div class="carousel-dots" id="cmpDots"></div>
+</section>
+
+<!-- ══════════════════════════════
+     S4 · CULTURE
+══════════════════════════════ -->
+<section id="s4">
+  <div class="section-label">Culture</div>
+  <h2 class="section-title">이색적인 종교와 문화</h2>
+  <div class="culture-grid">
+    <div class="culture-card">
+      <div class="culture-icon">🕌</div>
+      <div class="culture-title">이슬람 문화</div>
+      <div class="culture-desc">모스크, 재래 바자르, 아잔 소리. 동남아와는 다른, 중앙아시아 특유의 이슬람 문화를 일상 속에서 경험</div>
+    </div>
+    <div class="culture-card">
+      <div class="culture-icon">🏕️</div>
+      <div class="culture-title">유목 문화</div>
+      <div class="culture-desc">유르트 숙박, 초원에서 말타기, 쿠미스(마유주) 시음. 몽골보다 접근성이 좋으면서 경치는 더 화려함</div>
+    </div>
+    <div class="culture-card">
+      <div class="culture-icon">🛤️</div>
+      <div class="culture-title">실크로드</div>
+      <div class="culture-desc">동서양을 잇던 고대 무역로의 흔적. 다양한 문명이 교차한 역사를 도시 곳곳에서 직접 느낄 수 있음</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     S5 · 인터랙티브 멤버 프로필
+══════════════════════════════ -->
+<section id="s5">
+  <div class="section-label">Team Match</div>
+  <h2 class="section-title">멤버별로 이 여행이 맞는 이유</h2>
+
+  <div class="member-tabs" id="memberTabs"></div>
+
+  <div class="member-detail" id="memberDetail">
+    <div class="member-chart-wrap">
+      <canvas id="memberChart"></canvas>
+    </div>
+    <div class="member-info" id="memberInfo"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     S6 · WHY NOW
+══════════════════════════════ -->
+<section id="s6">
+  <div class="section-label">지금 가야 하는 이유</div>
+  <h2 class="section-title">이 타이밍을 놓치면 안 된다</h2>
+  <div class="reason-grid">
+
+    <div class="reason-card">
+      <div class="reason-num">Reason 01</div>
+      <div class="reason-icon-title">
+        <div class="reason-icon">👥</div>
+        <div class="reason-title">6명이 아니면 가기 어려운 여행</div>
+      </div>
+      <div class="reason-body">
+        나중에 따로 가려면 투어를 신청하거나 새로운 인원을 모집해야 하는 여행지.
+        이미 케미 검증된 6인팀이 있는 지금이 가장 좋은 타이밍.
+      </div>
+      <div class="reason-hl">
+        💬 "나중에 혼자 가도 되지" →<br>
+        투어 5인 모집 공고 올린 지 3개월째... 아직 2명 부족...
+      </div>
+    </div>
+
+    <div class="reason-card">
+      <div class="reason-num">Reason 02</div>
+      <div class="reason-icon-title">
+        <div class="reason-icon">⏰</div>
+        <div class="reason-title">나이 들기 전에 가야 하는 여행</div>
+      </div>
+      <div class="reason-body">
+        키르기스스탄은 트레킹, 말타기, 고도, 비포장 도로 등 체력적으로 만만하지 않은 여행지.
+        지금의 체력이 평생에서 가장 젊은 체력.
+      </div>
+      <div class="reason-hl">
+        💬 팀 체력 평균 63 — 지금도 이미 아슬아슬.<br>
+        10년 후엔 팀 체력이 얼마일까?
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 팀 스탯 -->
+  <div class="team-stat-wrap">
+    <div class="team-chart-box">
+      <canvas id="teamStatChart"></canvas>
+    </div>
+
+    <div class="team-bars">
+      <div class="tbar-row">
+        <span class="tbar-name">체력</span>
+        <div class="tbar-wrap">
+          <div class="tbar-req"  style="width:72%"></div>
+          <div class="tbar-team" style="width:63%; background:#6366f1;"></div>
+        </div>
+        <span class="tbar-icon">⚠️</span>
+        <span class="tbar-note">요구치 미달 — 현진이가 전담</span>
+      </div>
+      <div class="tbar-row">
+        <span class="tbar-name">계획력</span>
+        <div class="tbar-wrap">
+          <div class="tbar-req"  style="width:60%"></div>
+          <div class="tbar-team" style="width:72%; background:#10b981;"></div>
+        </div>
+        <span class="tbar-icon">✅</span>
+        <span class="tbar-note">은빈 97 덕분에 여유롭게 통과</span>
+      </div>
+      <div class="tbar-row">
+        <span class="tbar-name">텐션</span>
+        <div class="tbar-wrap">
+          <div class="tbar-req"  style="width:55%"></div>
+          <div class="tbar-team" style="width:78%; background:#f59e0b;"></div>
+        </div>
+        <span class="tbar-icon">✅</span>
+        <span class="tbar-note">소정 92로 팀 텐션 견인</span>
+      </div>
+      <div class="tbar-row">
+        <span class="tbar-name">수면력</span>
+        <div class="tbar-wrap">
+          <div class="tbar-req"  style="width:60%"></div>
+          <div class="tbar-team" style="width:74%; background:#0ea5e9;"></div>
+        </div>
+        <span class="tbar-icon">✅</span>
+        <span class="tbar-note">보영 98이 팀 평균 끌어올림</span>
+      </div>
+      <div class="tbar-row">
+        <span class="tbar-name">물개력</span>
+        <div class="tbar-wrap">
+          <div class="tbar-req"  style="width:35%"></div>
+          <div class="tbar-team" style="width:71%; background:#f43f5e;"></div>
+        </div>
+        <span class="tbar-icon">✅</span>
+        <span class="tbar-note">이식쿨 호수 수영도 문제없음</span>
+      </div>
+
+      <div class="team-stat-summary">
+        결론: <strong>4.5 / 5 통과.</strong>
+        체력은 현진이에게 의존하는 구조지만 투어를 활용하면 커버 가능.
+        <strong>계획력 1위 은빈</strong>이 있으니 동선 걱정은 없음.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════
+     S7 · 코멘트 + 투표
+══════════════════════════════ -->
+<section id="s7">
+  <div class="s7-layout">
+    <!-- 왼쪽: 헤더 + 투표 -->
+    <div class="s7-left">
+      <div class="s7-title">🇰🇿🏔️🇰🇬<br>27년 6월, 중앙아시아 붐은 온다!</div>
+      <div class="vote-section">
+        <div class="vote-wrap">
+          <button class="btn btn-yes" onclick="vote('yes')">🙋 찬성합니다</button>
+          <button class="btn btn-no"  onclick="vote('no')">😅 이소정의 체력으로 증명해라</button>
+        </div>
+        <div id="voteResult"></div>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 코멘트 폼 -->
+    <div class="s7-right">
+      <div style="font-size:14px; font-weight:700; color:white; margin-bottom:12px; text-align:center;">
+        💬 더 좋은 여행지가 생각난다면?!
+      </div>
+      <div class="comment-form">
+        <div>
+          <label class="cf-label">이름</label>
+          <input class="cf-input" id="cfName" placeholder="이름을 입력하세요" maxlength="20">
+        </div>
+        <div>
+          <label class="cf-label">여행지</label>
+          <input class="cf-input" id="cfDest" placeholder="추천하는 여행지" maxlength="30">
+        </div>
+        <div>
+          <label class="cf-label">추천 이유</label>
+          <textarea class="cf-textarea" id="cfReason" placeholder="한 줄 추천 이유"></textarea>
+        </div>
+        <button class="cf-submit" onclick="addComment()">등록하기 →</button>
+      </div>
+
+      <div class="comment-list" id="commentList">
+        <div class="comment-empty">아직 등록된 의견이 없어요 ☁️</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ─────────────────────────────
+// Navigation dots
+// ─────────────────────────────
+const sections = Array.from(document.querySelectorAll('section'));
+const navContainer = document.getElementById('navDots');
+
+sections.forEach((s, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  dot.onclick = () => s.scrollIntoView({ behavior: 'smooth' });
+  navContainer.appendChild(dot);
+});
+
+const dots = document.querySelectorAll('.nav-dot');
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = sections.indexOf(e.target);
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.5 });
+
+sections.forEach(s => obs.observe(s));
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const cur = sections.findIndex(s => {
+    const r = s.getBoundingClientRect();
+    return r.top >= -10 && r.top < window.innerHeight / 2;
+  });
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    sections[Math.min(cur + 1, sections.length - 1)]?.scrollIntoView({ behavior: 'smooth' });
+  }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    sections[Math.max(cur - 1, 0)]?.scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// ─────────────────────────────
+// S0 · Stars + City Rolling
+// ─────────────────────────────
+(function () {
+  const canvas = document.getElementById('starsCanvas');
+  const ctx = canvas.getContext('2d');
+  function resize() {
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = Array.from({ length: 160 }, () => ({
+    x: Math.random(), y: Math.random(),
+    r: Math.random() * 1.4 + 0.3,
+    a: Math.random(),
+    spd: Math.random() * 0.008 + 0.003,
+  }));
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.a += s.spd;
+      const alpha = (Math.sin(s.a) + 1) / 2 * 0.8 + 0.1;
+      ctx.beginPath();
+      ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+})();
+
+(function () {
+  const cities = ['하얼빈', '이시가키', '탄자니아', '시베리아', '오만', '이집트', '타이베이'];
+  const el = document.getElementById('cityRoll');
+  let idx = 0;
+
+  function next() {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      idx = (idx + 1) % cities.length;
+      el.textContent = cities[idx];
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }, 400);
+  }
+  setInterval(next, 1800);
+})();
+
+// ─────────────────────────────
+// SB · Image Strip
+// ─────────────────────────────
+(function () {
+  const stripImages = [
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTcg/MDAxNzUwODMxMDIxNTY2.5zgWR-LLPd5gim-iKqgWPQEsYXviXitU6j-Us4ao2skg.pn43jFL4zpO4NtMi-MRWTxVLN8HCrttHv5NeczQN_08g.JPEG/101169.jpg', name: '포르투' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA3MDJfMTU2/MDAxNzUxNDQ4ODI1ODk3.hwOMi5e2i40uaCqhKBOxfiPt7nq2_-OHbOS9jyzfULcg.LFkiu8NTTQE82j2ZoOU4Qzk9umYFtYMJb0O-DYJbyjYg.JPEG/569.jpg', name: '샌디에고' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA3MDJfMjc4/MDAxNzUxNDQ4NzUyNzk0.m7WEfJizIkiBfc3k-eGR1apW8YJLFQqOqtjqpwkx8uAg.IXd9CwD50csEpkDasjf35Za_r8PSmXuWr7xzlZV184gg.JPEG/98.jpg', name: '카사블랑카' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA3MDJfODQg/MDAxNzUxNDQ4Nzk2ODUz.uCiCjf3SgHWDUQDMa3sI-HMo3geU2R7nguaXXJ9NsDwg.QjS7C30rKj9gdwOY2nzw5T2HddXF4MfZ-khLfqTXnlsg.JPEG/318.jpg', name: '마카오' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTU5/MDAxNzUwODMxMDQyOTEx.HtrMDwI4iB6BIHEBJ6YeRnFcoaCDmJkItDPZByY2CAEg.IsPtGMFAQpaQeRNlQYAWkUxggVzfvlzbJC_kV-BrB7og.JPEG/101168.jpg', name: '팔라완' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTA1/MDAxNzUwODMxMDA0MTM3.xormA8ppXC0ffVX753GtX5yrnDJgzhuyoMMMUPq1QAog.o7r_wHjeDPzdRI6N4-uuiTLjOYyOJjjnHbKNf967P18g.JPEG/101167.jpg', name: '니스' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMjc3/MDAxNzUwODMwOTU4NzIw._Mmxn17SaGxO_ex-Drh9LhQl1si9bnxYWgDXOhiYZLwg.ZEIshmk7FIBxDWJiYwSlJcobf06iOtgXJ5WHCoRg41gg.JPEG/101165.jpg', name: '롬복' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTQx/MDAxNzUwODMxMTI4NDcy.dXt5hq0WFkJPtm8pQe1h-NXEXKb8mFZVTAVsQfdLYY0g.VBQmxhhvQ0WDkrGHrCTN-ZQFk0QsHJUbXS2KVoUbmWsg.JPEG/101166.jpg', name: '텐진' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA3MDJfMTkg/MDAxNzUxNDQ4NzMzNjk3.RzLtO7ZJbuWpP-agpspuWxAqhMk67SWbJxFVeG7LTFAg.pQ-gOdPqusgv8bruGwVVdNPAEb1502j5QDdqwnmVVzEg.JPEG/583.jpg', name: '아델레이드' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTMw/MDAxNzUwODMxMTE3MzU0.1fNDR79D2XOR3o19S4vZn7VI6hF752LKLUPzszmiWlQg.w2-J-kTOCWnhEZLb7e05NyeOvMILONStiilQ_G0nizUg.JPEG/101163.jpg', name: '티후아나' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMjIw/MDAxNzUwODMwNzk2NjU0.JwTg0TiEXgvM-eH_76_tk532Rk2YNTRUr9iTnu_w3qIg.tBwnXZYay4Pga0yb4qhILLtww5Dw82SgQtdhpTNGG6kg.JPEG/101161.jpg', name: '케이프타운' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTg3/MDAxNzUwODMwNzEzMTk5.ls-SEyeq4Ypqs870XWSTMmj7LTzucTXT9tCqZ20hSrkg.znIMBAymgRVHAtDnC6iF_Tv4d_a9h9x9AGQw099chrkg.JPEG/101160.jpg', name: '아메다바드' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMjE5/MDAxNzUwODMwNzIyODYw.N3HAcrVCgCTWBD4PeRhf8HtEBNvQjbQpTX2uQNx-DKAg.eOoPZSH_wjfGT5OxDCIDXPqqlh89TOGQQTsLub19a4Eg.JPEG/101159.jpg', name: '암리차르' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMjY2/MDAxNzUwODMwOTc3Nzk0.G2JiB9NiD-_xt_abh4k-WFSroWIKgE7lGtgXZbP1AQcg.Zi63DJHH2houvMgqIvpzbVi3y6Tduv1fxJ_PtgKGQRog.JPEG/101157.jpg', name: '마샤드' },
+    { url: 'https://flight-phinf.pstatic.net/MjAyNTA2MjVfMTAw/MDAxNzUwODMwOTkyMzQy.ZD8x7M-rECT1Tvme5kEfq2EPWoPAk0zX2RXah8qNN8Qg.ITfe9RmIZziiGJ6GI9ZH_1DnnUu22B4BWVnjAaPBwvYg.JPEG/101156.jpg', name: '모리셔스' },
+  ];
+
+  const track = document.getElementById('imgStrip');
+  // 2번 복제로 seamless loop
+  [...stripImages, ...stripImages].forEach(({ url, name }) => {
+    const item = document.createElement('div');
+    item.className = 'strip-item';
+    item.innerHTML = `
+      <img src="${url}" alt="${name}"
+           onerror="this.parentElement.innerHTML='<div class=strip-fallback>🌍</div><div class=strip-label>${name}</div>'">
+      <div class="strip-label">${name}</div>`;
+    track.appendChild(item);
+  });
+})();
+
+// ─────────────────────────────
+// S3 · Carousel
+// ─────────────────────────────
+let cmpIdx = 0;
+const cmpTotal = 4;
+const cmpSlidesEl = document.getElementById('cmpSlides');
+const cmpDotsEl = document.getElementById('cmpDots');
+
+for (let i = 0; i < cmpTotal; i++) {
+  const d = document.createElement('button');
+  d.className = 'cdot' + (i === 0 ? ' active' : '');
+  d.onclick = () => moveCmpTo(i);
+  cmpDotsEl.appendChild(d);
+}
+
+function moveCmp(dir) {
+  moveCmpTo((cmpIdx + dir + cmpTotal) % cmpTotal);
+}
+
+function moveCmpTo(idx) {
+  cmpIdx = idx;
+  cmpSlidesEl.style.transform = `translateX(-${cmpIdx * 100}%)`;
+  document.querySelectorAll('.cdot').forEach((d, i) => d.classList.toggle('active', i === cmpIdx));
+}
+
+// ─────────────────────────────
+// S6 · Team Stat Radar Chart
+// ─────────────────────────────
+new Chart(document.getElementById('teamStatChart'), {
+  type: 'radar',
+  data: {
+    labels: ['체력', '계획력', '텐션', '수면력', '물개력'],
+    datasets: [
+      {
+        label: '팀 평균',
+        data: [63, 72, 78, 74, 71],
+        backgroundColor: 'rgba(99,102,241,0.2)',
+        borderColor: '#6366f1',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#6366f1',
+        pointRadius: 4,
+      },
+      {
+        label: '여행 요구치',
+        data: [72, 60, 55, 60, 35],
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderColor: 'rgba(255,255,255,0.3)',
+        borderWidth: 2,
+        borderDash: [5, 4],
+        pointBackgroundColor: 'rgba(255,255,255,0.4)',
+        pointRadius: 3,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      r: {
+        min: 0, max: 100,
+        ticks: { display: false, stepSize: 25 },
+        grid:        { color: 'rgba(255,255,255,0.08)' },
+        angleLines:  { color: 'rgba(255,255,255,0.08)' },
+        pointLabels: { color: '#94a3b8', font: { size: 12, weight: '600' } }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 }
+      }
+    }
+  }
+});
+
+// ─────────────────────────────
+// S5 · Interactive Member Profiles
+// ─────────────────────────────
+const members = [
+  {
+    name: '이소정', nick: 'Sojung', emoji: '🎭', color: '#6366f1',
+    type: '썰 수집형 여행가', note: '중국산 배터리 같은 체력',
+    mbti: 'ENTP', mbtiEst: 'ENFP',
+    axes: ['체력','계획력','텐션','수면력','물개력','추진력'],
+    stats: [35, 65, 92, 42, 28, 82],
+    reason: '중앙아시아만큼 평생 써먹을 썰이 쌓이는 곳이 없음. 아프리카, 하얼빈, 이시가키, 카자흐스탄/키르기스스탄 레츠고',
+  },
+  {
+    name: '최강석', nick: '캉형부', emoji: '🛠️', color: '#0ea5e9',
+    type: '장비 덕후형 여행가', note: '아낌없이 주는 나무',
+    mbti: 'ENFJ?', mbtiEst: 'ISTJ',
+    axes: ['체력','계획력','텐션','수면력','물개력','챙김력'],
+    stats: [55, 85, 65, 58, 75, 95],
+    reason: '트레킹 장비 풀세팅의 공식 명분 확보. 팀 정보 허브 + 챙김 담당으로 오지 여행에 최적화된 인물',
+  },
+  {
+    name: '임보영', nick: '보보', emoji: '📸', color: '#f43f5e',
+    type: '자연 속 몰입형 여행가', note: '어느 곳에서나 잘 적응함',
+    mbti: 'ISFP', mbtiEst: 'ESFJ',
+    axes: ['체력','계획력','텐션','수면력','물개력','낙천적'],
+    stats: [65, 48, 80, 98, 92, 97],
+    reason: '"미대"출신 보영이가 나설 때. 영상미와 함께 낙천력 97로 어떤 변수도 소화 가능',
+  },
+  {
+    name: '김은빈', nick: '은겔러', emoji: '📋', color: '#10b981',
+    type: '완벽 준비형 여행가', note: '인간 29cm 느좋녀',
+    mbti: 'ESTJ', mbtiEst: 'ISFJ',
+    axes: ['체력','계획력','텐션','수면력','물개력','업무량'],
+    stats: [65, 97, 68, 72, 88, 94],
+    reason: '투어 상품이 잘 구비되어 계획 짜기 좋은 여행지. 은빈의 계획력 97이 드디어 100% 발휘될 무대',
+  },
+  {
+    name: '김현진', nick: '현진', emoji: '🗺️', color: '#f59e0b',
+    type: '현지 탐험형 여행가', note: '75kg를 움직일 수 있음. 보부상',
+    mbti: 'ENFP', mbtiEst: 'ISFP',
+    axes: ['체력','계획력','텐션','수면력','물개력','보부상'],
+    stats: [88, 52, 85, 85, 92, 97],
+    reason: '초원에서 말타기 = 보부상력 MAX 활용 타이밍. 체력 88로 팀 전체의 체력도 커버하는 일석이조',
+  },
+  {
+    name: '김민주', nick: '장군 삐샤', emoji: '🔍', color: '#8b5cf6',
+    type: '발품 리서치형 여행가', note: '별명이 민주 귀여워 킴',
+    mbti: 'ESFJ', mbtiEst: 'ENTJ',
+    axes: ['체력','계획력','텐션','수면력','물개력','맛집탐방'],
+    stats: [68, 87, 78, 90, 52, 91],
+    reason: '아직 한국에 제대로 소개 안 된 맛집 탐방의 성지. 알마티 로컬 식당 개척은 민주에게 맡기면 됨',
+  },
+];
+
+let memberChartInstance = null;
+let selectedMember = 0;
+
+const memberTabsEl = document.getElementById('memberTabs');
+
+members.forEach((m, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'mtab' + (i === 0 ? ' active' : '');
+  btn.textContent = `${m.emoji} ${m.name}`;
+  if (i === 0) { btn.style.background = m.color; btn.style.borderColor = m.color; }
+  btn.onclick = () => selectMember(i);
+  memberTabsEl.appendChild(btn);
+});
+
+function selectMember(idx) {
+  selectedMember = idx;
+  const m = members[idx];
+
+  // update tab styles
+  document.querySelectorAll('.mtab').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+    btn.style.background = i === idx ? members[i].color : 'white';
+    btn.style.borderColor = i === idx ? members[i].color : '#e2e8f0';
+    btn.style.color = i === idx ? 'white' : '#64748b';
+  });
+
+  // update detail card border
+  document.getElementById('memberDetail').style.boxShadow = `0 4px 24px ${m.color}25`;
+
+  // update member info
+  document.getElementById('memberInfo').innerHTML = `
+    <div class="member-info-top">
+      <div class="member-emoji-icon" style="background:${m.color}15; border:1.5px solid ${m.color}30;">${m.emoji}</div>
+      <div>
+        <div class="member-detail-name">${m.name}</div>
+        <div style="font-size:12px; color:#64748b; margin-top:3px;">💬 ${m.note}</div>
+        <div style="display:flex; align-items:center; gap:6px; margin-top:6px; flex-wrap:wrap;">
+          <div class="member-detail-type" style="color:${m.color}; background:${m.color}15; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;">${m.type}</div>
+          <div style="background:#f1f5f9; color:#475569; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;">
+            MBTI: ${m.mbti}<span style="color:#94a3b8; font-weight:400;"> (AI 추정 ${m.mbtiEst})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="member-reason-label">이 여행이 맞는 이유</div>
+    <div class="member-reason-text" style="border-left-color:${m.color}; color:#334155;">${m.reason}</div>
+    <div class="member-sig-stat" style="background:${m.color}15; color:${m.color};">
+      ✦ 시그니처 스탯: ${m.axes[5]} ${m.stats[5]}
+    </div>
+  `;
+
+  // destroy old chart
+  if (memberChartInstance) { memberChartInstance.destroy(); memberChartInstance = null; }
+
+  // create new chart
+  const canvas = document.getElementById('memberChart');
+  memberChartInstance = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: m.axes,
+      datasets: [{
+        data: m.stats,
+        backgroundColor: m.color + '33',
+        borderColor: m.color,
+        borderWidth: 2.5,
+        pointBackgroundColor: m.color,
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false, stepSize: 25 },
+          grid:        { color: 'rgba(0,0,0,0.07)' },
+          angleLines:  { color: 'rgba(0,0,0,0.07)' },
+          pointLabels: {
+            color: '#475569',
+            font: { size: 11, weight: '600' },
+          }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+// init with first member
+selectMember(0);
+
+// ─────────────────────────────
+// S7 · Vote
+// ─────────────────────────────
+const votes = { yes: 0, no: 0 };
+function vote(type) {
+  votes[type]++;
+  const total = votes.yes + votes.no;
+  const yesP = Math.round(votes.yes / total * 100);
+  document.getElementById('voteResult').textContent =
+    `🙋 찬성 ${yesP}%  ·  😅 보류 ${100 - yesP}%  (총 ${total}표)`;
+}
+
+// ─────────────────────────────
+// S7 · Comment Form
+// ─────────────────────────────
+const commentListEl = document.getElementById('commentList');
+
+function addComment() {
+  const name   = document.getElementById('cfName').value.trim();
+  const dest   = document.getElementById('cfDest').value.trim();
+  const reason = document.getElementById('cfReason').value.trim();
+
+  if (!name || !dest) { alert('이름과 여행지를 입력해주세요 😊'); return; }
+
+  // clear empty state
+  const empty = commentListEl.querySelector('.comment-empty');
+  if (empty) empty.remove();
+
+  const item = document.createElement('div');
+  item.className = 'comment-item';
+  item.innerHTML = `
+    <div class="ci-header">
+      <span class="ci-name">${escHtml(name)}</span>
+      <span class="ci-dest">✈️ ${escHtml(dest)}</span>
+    </div>
+    ${reason ? `<div class="ci-reason">${escHtml(reason)}</div>` : ''}
+  `;
+  commentListEl.prepend(item);
+
+  // clear form
+  document.getElementById('cfName').value = '';
+  document.getElementById('cfDest').value = '';
+  document.getElementById('cfReason').value = '';
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────
+// Lightbox (SC 섹션 이미지 카드)
+// ─────────────────────────────
+const lbImages = [
+  { src: 'img-kyrg-bishkek.jpg',    label: '도시 뒤로 설산이 펼쳐진 비슈케크' },
+  { src: 'img-kaza-summer.jpg',     label: '푸릇함이 펼쳐진 여름 카자흐스탄' },
+  { src: 'img-kaza-LakeKaindy.jpg', label: '물 위 자작나무 숲 카인디 호수' },
+  { src: 'img-kyrg-Karakoł.jpg',    label: '산과 하늘에 압도되는 알틴 아라샨' },
+];
+
+let lbIdx = 0;
+
+function openLightbox(idx) {
+  lbIdx = idx;
+  document.getElementById('lightbox').classList.add('open');
+  renderLb();
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+function moveLb(dir) {
+  lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
+  renderLb();
+}
+
+function renderLb() {
+  const img   = document.getElementById('lbImg');
+  const label = document.getElementById('lbLabel');
+  const counter = document.getElementById('lbCounter');
+
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = lbImages[lbIdx].src;
+    img.alt = lbImages[lbIdx].label;
+    img.style.opacity = '1';
+  }, 150);
+
+  label.textContent   = lbImages[lbIdx].label;
+  counter.textContent = `${lbIdx + 1} / ${lbImages.length}`;
+
+  document.querySelectorAll('.lb-dot').forEach((d, i) =>
+    d.classList.toggle('active', i === lbIdx)
+  );
+}
+
+// 키보드: 방향키 + ESC
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowRight') moveLb(1);
+  if (e.key === 'ArrowLeft')  moveLb(-1);
+  if (e.key === 'Escape')     closeLightbox();
+  e.stopPropagation();
+}, true);
+</script>
+
+<!-- ── Lightbox Modal ── -->
+<div id="lightbox" onclick="if(event.target===this) closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-btn lb-prev" onclick="moveLb(-1)">←</button>
+
+  <div class="lb-img-wrap">
+    <img id="lbImg" src="" alt="">
+  </div>
+
+  <div class="lb-dots" id="lbDots">
+    <!-- JS로 생성 -->
+  </div>
+
+  <div class="lb-label" id="lbLabel"></div>
+  <div class="lb-counter" id="lbCounter"></div>
+
+  <button class="lb-btn lb-next" onclick="moveLb(1)">→</button>
+</div>
+
+<script>
+// dot 버튼 생성
+(function() {
+  const wrap = document.getElementById('lbDots');
+  lbImages.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'lb-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => { lbIdx = i; renderLb(); };
+    wrap.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
