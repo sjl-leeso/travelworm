@@ -237,6 +237,19 @@
     .exp-left { flex: 1; }
     .exp-right { width: 320px; flex-shrink: 0; }
 
+    @media (max-width: 768px) {
+      .exp-layout {
+        flex-direction: column;
+        gap: 28px;
+      }
+      .exp-right {
+        width: 100%;
+      }
+      .exp-title {
+        font-size: 22px;
+      }
+    }
+
     .exp-eyebrow {
       font-size: 11px; letter-spacing: 5px; color: #6366f1;
       text-transform: uppercase; margin-bottom: 14px;
@@ -395,7 +408,7 @@
       letter-spacing: 1px; line-height: 1.4;
     }
     .hero-title {
-      font-size: 62px; font-weight: 900; line-height: 1.05;
+      font-size: 44px; font-weight: 900; line-height: 1.05;
       margin: 6px 0;
       background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -405,6 +418,12 @@
     .hero-cards {
       display: grid; grid-template-columns: repeat(4, 1fr);
       gap: 12px; width: 100%; max-width: 860px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .hero-card {
