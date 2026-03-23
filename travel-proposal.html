@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🇰🇿🇰🇬 카자흐스탄 + 키르기스스탄</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1688,48 +1690,91 @@ function selectMember(idx) {
 selectMember(0);
 
 // ─────────────────────────────
-// S7 · Vote
+// S7 · Firebase Init
 // ─────────────────────────────
-const votes = { yes: 0, no: 0 };
-function vote(type) {
-  votes[type]++;
-  const total = votes.yes + votes.no;
-  const yesP = Math.round(votes.yes / total * 100);
+const firebaseConfig = {
+  apiKey: "AIzaSyDplPxwSXTg1fH2s26764bjhWUhsv2JkFE",
+  authDomain: "sjl-travelworm.firebaseapp.com",
+  projectId: "sjl-travelworm",
+  storageBucket: "sjl-travelworm.firebasestorage.app",
+  messagingSenderId: "803042589444",
+  appId: "1:803042589444:web:1177537aa6bbf8852aee51"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ─────────────────────────────
+// S7 · Vote (Firestore)
+// ─────────────────────────────
+const voteDocRef = db.doc('votes/result');
+
+voteDocRef.onSnapshot(snap => {
+  if (!snap.exists) return;
+  const d = snap.data();
+  const total = (d.yes || 0) + (d.no || 0);
+  if (!total) return;
+  const yesP = Math.round((d.yes || 0) / total * 100);
   document.getElementById('voteResult').textContent =
     `🙋 찬성 ${yesP}%  ·  😅 보류 ${100 - yesP}%  (총 ${total}표)`;
+});
+
+function vote(type) {
+  voteDocRef.set(
+    { [type]: firebase.firestore.FieldValue.increment(1) },
+    { merge: true }
+  );
 }
 
 // ─────────────────────────────
-// S7 · Comment Form
+// S7 · Comment Form (Firestore)
 // ─────────────────────────────
 const commentListEl = document.getElementById('commentList');
 
-function addComment() {
+db.collection('comments')
+  .orderBy('createdAt', 'desc')
+  .onSnapshot(snapshot => {
+    commentListEl.innerHTML = '';
+    if (snapshot.empty) {
+      commentListEl.innerHTML = '<div class="comment-empty">아직 등록된 의견이 없어요 ☁️</div>';
+      return;
+    }
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const item = document.createElement('div');
+      item.className = 'comment-item';
+      item.innerHTML = `
+        <div class="ci-header">
+          <span class="ci-name">${escHtml(d.name)}</span>
+          <span class="ci-dest">✈️ ${escHtml(d.dest)}</span>
+        </div>
+        ${d.reason ? `<div class="ci-reason">${escHtml(d.reason)}</div>` : ''}
+      `;
+      commentListEl.appendChild(item);
+    });
+  });
+
+async function addComment() {
   const name   = document.getElementById('cfName').value.trim();
   const dest   = document.getElementById('cfDest').value.trim();
   const reason = document.getElementById('cfReason').value.trim();
-
   if (!name || !dest) { alert('이름과 여행지를 입력해주세요 😊'); return; }
 
-  // clear empty state
-  const empty = commentListEl.querySelector('.comment-empty');
-  if (empty) empty.remove();
+  const btn = document.querySelector('.cf-submit');
+  btn.disabled = true; btn.textContent = '등록 중...';
 
-  const item = document.createElement('div');
-  item.className = 'comment-item';
-  item.innerHTML = `
-    <div class="ci-header">
-      <span class="ci-name">${escHtml(name)}</span>
-      <span class="ci-dest">✈️ ${escHtml(dest)}</span>
-    </div>
-    ${reason ? `<div class="ci-reason">${escHtml(reason)}</div>` : ''}
-  `;
-  commentListEl.prepend(item);
-
-  // clear form
-  document.getElementById('cfName').value = '';
-  document.getElementById('cfDest').value = '';
-  document.getElementById('cfReason').value = '';
+  try {
+    await db.collection('comments').add({
+      name, dest, reason,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('cfName').value = '';
+    document.getElementById('cfDest').value = '';
+    document.getElementById('cfReason').value = '';
+  } catch(e) {
+    alert('등록 실패. 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false; btn.textContent = '등록하기 →';
+  }
 }
 
 function escHtml(str) {
@@ -1825,5 +1870,6 @@ document.addEventListener('keydown', e => {
   });
 })();
 </script>
+
 </body>
 </html>
