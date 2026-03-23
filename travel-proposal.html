@@ -136,6 +136,21 @@
     .sa-photo {
       flex-shrink: 0; width: 260px;
     }
+
+    @media (max-width: 768px) {
+      .sa-layout {
+        flex-direction: column;
+        gap: 28px;
+        align-items: center;
+      }
+      .sa-photo {
+        width: 200px;
+      }
+      .sa-right {
+        width: 100%;
+        text-align: left;
+      }
+    }
     .sa-photo img {
       width: 100%; border-radius: 24px;
       box-shadow: 0 0 60px rgba(99,102,241,0.3);
@@ -903,15 +918,14 @@
 
     <!-- 텍스트 -->
     <div class="sa-right">
-      <div class="presenter-badge">🎤 오늘의 발표자</div>
+      <div class="presenter-badge">🎤 Who Am I?</div>
       <div class="presenter-name">이소정</div>
 
       <p class="presenter-intro">
         <strong>세치 혀</strong>로 회사 사람 6명이 인당 <strong>1,600만 원</strong>씩 돈내고
         12일 휴가 쓰게 만든 사람.<br>
         <strong>영하 20도</strong> 하얼빈으로 동기 남편을 데려간 사람.<br>
-        이제 5월에 <strong>이시가키</strong>라고 태어나서 처음 듣는 곳으로
-        여러분 5명을 인도할 사람.<br><br>
+        모두 <strong>미야코지마</strong>를 갈 때 그 옆에 <strong>이시가키</strong>로 인도하는 사람.<br><br>
         여행의 악마, 여행의 수도자,<br>
         여행의 알파이자 오메가, 항공권의 기획자<br>
         <strong>이소정</strong>
